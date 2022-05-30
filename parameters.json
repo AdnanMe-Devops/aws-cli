@@ -1,0 +1,22 @@
+nano parameters.json
+{
+  "ImageId": "ami-021e15f46d293ec60",
+  "InstanceType": "t4g.micro",
+  "KeyName": "706169215902",
+  "SecurityGroupIds": [
+    "sg-01a4ef83ddc91a91d"
+  ],
+  "UserData":  "IyEvYmluL2Jhc2gKY3VybCAtc0wgaHR0cHM6Ly9naXRodWIuY29tL2Nsb3VkYWNhZGVteS9zYW1wbGUtc3RhdGljLXdlYi1zaXRlL2FyY2hpdmUvcmVmcy90YWdzL3YwLjAuMi56aXAgPiBhcHAuemlwCnVuemlwIGFwcC56aXAKY2Qgc2FtcGxlLXN0YXRpYy13ZWItc2l0ZSoKYmFzaCB0ZW1wbGF0ZS5zaApub2h1cCBiYXNoIHJ1bi5zaCAmCg==",
+  "TagSpecifications": [ {
+    "ResourceType": "instance",
+    "Tags": [
+      {
+        "Key": "Name",
+        "Value": "lab-auto-scaling"
+      }
+    ]
+  } ],
+  "Monitoring": {
+    "Enabled" : true
+  }
+}
