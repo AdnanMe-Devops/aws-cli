@@ -1,0 +1,94 @@
+To create a new launch template, enter the following AWS CLI command:
+aws ec2 create-launch-template \
+  --launch-template-name cloudblocket \
+  --launch-template-data file://parameters.json
+  
+  To see the manual for the create-auto-scaling-group command, enter the following:
+  aws autoscaling create-auto-scaling-group help
+  
+  To create a new Auto Scaling group, enter the following command:
+  aws autoscaling create-auto-scaling-group \
+  --auto-scaling-group-name blocket\
+  --launch-template LaunchTemplateName=lab \
+  --min-size 1 \
+  --max-size 3 \
+  --desired 1 \
+  --availability-zones us-west-2a us-west-2b
+  
+  aws autoscaling describe-auto-scaling-groups
+  
+  to fetch the identifier of the instance launched by your auto scaling group, run the following command:
+  aws ec2 describe-instances \
+  --filters "Name=tag-value,Values=blocket-auto-scaling" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].InstanceId'
+  
+  To enable the collection of Amazon CloudWatch metrics for your group, enter the following:
+  aws autoscaling enable-metrics-collection --auto-scaling-group-name blocket --granularity 1Minute
+  
+  To view auto scaling events, enter the following command:
+  aws autoscaling describe-scaling-activities --auto-scaling-group-name blocket
+  
+  To create a scheduled action for your group, in the terminal enter the following command
+  aws autoscaling put-scheduled-update-group-action \
+  --auto-scaling-group-name blocket \
+  --scheduled-action-name morning \
+  --desired 2 \
+  --start-time "2015-01-01T09:00:00Z"
+  
+  To create an action that scales down in the evening, enter the following, replacing the date with one in the future
+  aws autoscaling put-scheduled-update-group-action \
+  --auto-scaling-group-name blocket \
+  --scheduled-action-name evening \
+  --desired 1 \
+  --start-time "YYYY-MM-DDT19:00:00Z"
+  
+  To see your scheduled actions described, enter the following command
+  aws autoscaling describe-scheduled-actions
+  
+  Enter the following command to scale up to three instances
+  aws autoscaling update-auto-scaling-group \
+  --auto-scaling-group-name blocket \
+  --desired-capacity 3
+  
+  To verify that three instances have been launched, rerun this command
+  aws ec2 describe-instances \
+  --filters "Name=tag-value,Values=lab-auto-scaling" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].InstanceId'
+  
+  Rerun the activities command to see the scaling events
+  aws autoscaling describe-scaling-activities --auto-scaling-group-name blocket
+  
+  To see Amazon CloudWatch metric data for your auto scaling group, enter the following
+  END_TIME=$(date '+%Y-%m-%dT%H:%M:%SZ')
+START_TIME=$(date '+%Y-%m-%dT%H:%M:%SZ' -d '1 hour ago')
+DIMENSIONS="Name=AutoScalingGroupName,Value=lab"
+
+aws cloudwatch get-metric-statistics \
+  --namespace 'AWS/AutoScaling' \
+  --metric-name GroupDesiredCapacity \
+  --statistics Maximum \
+  --period 3600 \
+  --end-time $END_TIME \
+  --start-time $START_TIME \
+  --dimensions $DIMENSIONS \
+  --region us-west-2
+  
+  To list available load balancers, enter the following command
+  aws elbv2 describe-load-balancers
+  
+  Store the value of the DNSName attribute into a shell variable
+  dns_name=$(aws elbv2 describe-load-balancers --query 'LoadBalancers[0].DNSName' --output text)
+  
+  to see details of the load balancer's target group, enter the following command
+  aws elbv2 describe-target-groups
+  
+  Store the TargetGroupArn in the response of the previous command in a shell variable.
+  tg_arn=$(aws elbv2 describe-target-groups --query 'TargetGroups[0].TargetGroupArn' --output text)
+  
+  To connect your group to the target group, enter the following
+  aws autoscaling attach-load-balancer-target-groups \
+  --auto-scaling-group-name lab \
+  --target-group-arns $tg_arn
+  
+  Enter the following and click the link that is output to the terminal to navigate to the load balancer's DNSName in a new browser tab:
+  echo http://$dns_name
